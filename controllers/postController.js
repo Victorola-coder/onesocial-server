@@ -1,25 +1,39 @@
 const User = require('../models/User');
 const twitterService = require('../services/twitterService');
+// WIll import other platform services here
 
-exports.createPost = async (req, res) => {
+exports.createPost = async (req, res, next) => {
   try {
     const { content, platforms } = req.body;
     const user = await User.findById(req.user.id);
 
     const results = [];
 
-    if (platforms.includes('twitter')) {
-      const twitterAccount = user.socialAccounts.find(account => account.platform === 'twitter');
-      if (twitterAccount) {
-        const tweet = await twitterService.postTweet(twitterAccount.accessToken, twitterAccount.refreshToken, content);
-        results.push({ platform: 'twitter', result: tweet });
+    for (const platform of platforms) {
+      const account = user.socialAccounts.find(acc => acc.platform === platform);
+      if (!account) {
+        results.push({ platform, error: 'Not connected' });
+        continue;
+      }
+
+      try {
+        let result;
+        switch (platform) {
+          case 'twitter':
+            result = await twitterService.postTweet(account.accessToken, account.refreshToken, content);
+            break;
+          // We will add cases for other platforms here
+          default:
+            throw new Error(`Unsupported platform: ${platform}`);
+        }
+        results.push({ platform, result });
+      } catch (error) {
+        results.push({ platform, error: error.message });
       }
     }
 
-    // will add similar blocks for other platforms
-
-    res.json({ message: 'Post created successfully', results });
+    res.json({ message: 'Post creation completed', results });
   } catch (error) {
-    res.status(500).json({ error: 'Error creating post' });
+    next(error);
   }
 };
