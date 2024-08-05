@@ -24,6 +24,8 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
 // Routes (we'll add these later)
 app.use('/api/auth', require('./routes/twitterAuthRoutes'));
 app.use('/api/posts', require('./routes/postRoutes'));
+const errorHandler = require('./middleware/errorHandler');
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
