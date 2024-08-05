@@ -24,6 +24,7 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
 // Routes (we'll add these later)
 app.use('/api/auth', require('./routes/twitterAuthRoutes'));
 app.use('/api/posts', require('./routes/postRoutes'));
+app.use('/api/user', require('./routes/userRoutes'));
 const errorHandler = require('./middleware/errorHandler');
 app.use(errorHandler);
 
