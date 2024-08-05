@@ -17,8 +17,10 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.2",
     "node-fetch": "^3.3.2",
+    "oauth": "^0.10.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
-    "passport-oauth2": "^1.8.0"
+    "passport-oauth2": "^1.8.0",
+    "passport-twitter": "^1.0.4"
   }
 }
