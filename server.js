@@ -1,8 +1,14 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const passport = require('./config/passport');
 const session = require('express-session');
+const result = dotenv.config();
+
+if (result.error) {
+  throw result.error;
+}
 
 dotenv.config();
 
@@ -27,6 +33,7 @@ app.use('/api/posts', require('./routes/postRoutes'));
 app.use('/api/user', require('./routes/userRoutes'));
 const errorHandler = require('./middleware/errorHandler');
 app.use(errorHandler);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
