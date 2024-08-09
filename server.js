@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const passport = require('./config/passport');
 const session = require('express-session');
 const result = dotenv.config();
+const authRoutes = require('./routes/authRoutes');
 
 if (result.error) {
   throw result.error;
@@ -31,8 +32,10 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
 app.use('/api/auth', require('./routes/twitterAuthRoutes'));
 app.use('/api/posts', require('./routes/postRoutes'));
 app.use('/api/user', require('./routes/userRoutes'));
+app.use('/api/auth', authRoutes);
 const errorHandler = require('./middleware/errorHandler');
 app.use(errorHandler);
+
 
 
 const PORT = process.env.PORT || 5000;
