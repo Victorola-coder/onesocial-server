@@ -1,20 +1,40 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-module.exports = async (req, res, next) => {
+const authenticate = async (req, res, next) => {
   try {
-    const token = req.header('Authorization').replace('Bearer ', '');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findOne({ _id: decoded.userId });
-
-    if (!user) {
-      throw new Error();
+    // Get the token from the Authorization header
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
+      return res.status(401).json({ error: 'No token provided' });
     }
 
-    req.token = token;
+    const token = authHeader.replace('Bearer ', '');
+
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Find the user
+    const user = await User.findOne({ _id: decoded.userId }).select('-password');
+
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    // Attach the user and token to the request object
     req.user = user;
+    req.token = token;
+
     next();
   } catch (error) {
-    res.status(401).send({ error: 'Please authenticate.' });
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired' });
+    }
+    res.status(500).json({ error: 'Server error' });
   }
 };
+
+module.exports = authenticate;
